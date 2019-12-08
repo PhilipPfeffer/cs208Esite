@@ -12,14 +12,69 @@
     <header>
         <h1>Bio-Inspired Algorithms</h1>
         <h3>Phil & Raul aka Lil' Git and Yung Commit -m, not necessarily in that order.</h3>
+        <aside>We'll be covering two topics: <a href="#genalgo">genetic algorithms</a> and <a href="#swarm">swarm algorithms</a>. 
+                We will then explain our implementation of a genetic algorithm that solves the card game <a href="#blackjack">blackjack</a>.</aside>
     </header>
-        
+    
+        <a name="genalgo"></a>
         <h2>Genetic Algorithms</h2>
-        
+        <p>Genetic algorithms are inspired from the natural process of evolution. We will have two running examples. First,
+            a general example of trying to solve a maze. And second, a more specific example of trying to create good 
+            blackjack players. The phenomenon is broken down into the five following sections:</p>
+        <ul>
+            <li><a href="#chromosomes">Chromosomes</a></li>
+            <li><a href="#generation">Generation</a></li>
+            <li><a href="#selection">Selection</a></li>
+            <li><a href="#crossover">Crossover</a></li>
+            <li><a href="#mutation">Mutation</a></li>
+        </ul>
+
+        <a name="chromosomes"></a>
+        <h3>Chromosomes</h3>
+        <p>A chromosome is a single member of the population. In natural terms, think of this as a single lion, tiger or bear. Oh my!
+            <br><br>
+            In algorithmic terms, think of a chromosome as a solution to the problem you are trying to solve. For example, if you are 
+            trying to solve a maze, a chromosome could be a sequence of steps from the centre of the maze to the maze exit. Often, the
+            problem will have a feature vector &Phi;(x). If this is the case, the chromosome will be the weight vector, w, that corresponds to that
+            feature vector. Calculating the dot product w&middot;&Phi;(x) gives a number. This dot product can now be used to make decisions.
+            <br><br>
+            To explain these, let's begin our blackjack example. Imagine each chromosome is a blackjack player. We'll simplify the game
+            so that the players are not playing against a dealer or other players but against the deck. In this case we can define the feature 
+            vector for each player to be [score, numAs, num2s, ..., num10s, numJs, numQs, numKs] and the weight vector (chromosome) to be 
+            [w_1, ..., w_n]. We choose to normalise these weights to 1 where each w_i is between 0 and 1.
+            <br><br>
+            If the dot product between features and weights, w&middot;&Phi;(x), is closer to 1 than to 0, you choose to quit. Conversely, 
+            you can choose to hit and draw another card.
+        </p>
+
+        <a name="generation"></a>
+        <h3>Generation</h3>
+        <p>This is an easy one. A generation is a particular set of chromosomes. You can think of it as the population of all players in 
+            the current iteration of the algorithm.
+        </p>
+
+        <a name="selection"></a>
+        <h3>Selection</h3>
+        <p>Talk about fitness function, selective threshhold & how this can vary for both maze example and for blackjack example.</p>
+
+        <a name="crossover"></a>
+        <h3>Crossover</h3>
+        <p></p>
+
+        <a name="mutation"></a>
+        <h3>Mutation</h3>
+        <p></p>
+
         <hr>
         
+        <a name="swarm"></a>
         <h2>Swarm Algorithms</h2>
         
         <hr>
-</body>
-</html>
+
+        <a name="blackjack"></a>
+        <h2>Our Blackjack Genetic Algorithm</h2>
+        
+        <hr>
+    </body>
+    </html>
