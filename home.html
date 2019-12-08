@@ -13,7 +13,9 @@
         <h1>Bio-Inspired Algorithms</h1>
         <h3>Phil & Raul aka Lil' Git and Yung Commit -m, not necessarily in that order.</h3>
         <aside>We'll be covering two topics: <a href="#genalgo">genetic algorithms</a> and <a href="#swarm">swarm algorithms</a>. 
-                We will then explain our implementation of a genetic algorithm that solves the card game <a href="#blackjack">blackjack</a>.</aside>
+                We will then explain our implementation of a genetic algorithm that solves the card game <a href="#blackjack">blackjack</a>.
+                Layout inspired by minimalist design and this beautiful, expletive-laden <a href="http://motherfuckingwebsite.com/">website</a>.
+        </aside>
     </header>
     
         <a name="genalgo"></a>
@@ -55,7 +57,7 @@
 
         <a name="selection"></a>
         <h3>Selection</h3>
-        <p>Talk about fitness function, selective threshhold & how this can vary for both maze example and for blackjack example.</p>
+        <p>Talk about fitness function, selective threshold & how this can vary for both maze example and for blackjack example.</p>
 
         <a name="crossover"></a>
         <h3>Crossover</h3>
@@ -65,16 +67,97 @@
         <h3>Mutation</h3>
         <p></p>
 
+        <h3>Disclaimer: Is it good tho?</h3>
+        <p> No. This is a very fun idea to explore, but it boils down to having some very basic selection criteria and very naive 
+            optimisation/updating methods. It's only marginally better than a random search. If you ever see a weight vector in the wild, please don't
+            write a genetic algorithm for it. That is, unless you are looking for a way out and can't afford the flight to Switzerland. We have much
+            better ways to do this now-a-days, and we encourage you to study techniques such as Q-learning. Sorry, Greta Thunberg, but here 
+            it's Humans 1 - Nature 0.
+        </p>
+
         <hr>
         
         <a name="swarm"></a>
         <h2>Swarm Algorithms</h2>
         
+        <p> Swarm algorithms are also inspired by behaviours seen in nature. They work on the principle that the interactions between
+            many simple agents can produce complex behaviour. Ant colonies served as the initial inspiration for the creators of the first 
+            such algorithms. While ants are almost completely blind, when interacting with each other they are somehow able to find the 
+            shortest path to a food source. We call this behaviour "emergent behaviour", which encapsulates the idea that the whole is worth
+            more than the sum of its parts. In this explanation, we will focus on the Ant-Quantity algorithm put forward in this 1991/2 paper:
+            <cite>Distributed Optimization by Ant Colonies</cite> by Colorni, A., Dorigo, M., Maniezzo, V., Varela, F.J., & Bourgine, P. (1992).
+        </p>
+
+        <h3>Antz</h3>
+        <p> In the outside world, ants leave pheromone trails as they walk. At first, ants will search for food almost randomly, leaving trails
+            of pheronome like tiny versions of Hansel and Gretel. Other ants following are much more likely to take paths covered in pheromone 
+            than paths that aren't. After some time and lots of ants, they <i>almost</i> magically find the shortest path to food. 
+        </p>
+
+        <h3>Pheromone</h3>
+        <p> Look at the drawing below, particularly at Fig. 1 b). Imagine you are an ant starting at A and trying to reach a food source at E. At B
+            you suddenly bump into a food source. Being nearly blind, you do not know whether it it better to turn right to C or left ot H. The best
+            you can do now is turn right with probability 0.5 and left with probability 0.5. Let's split you into two ants now - one that chose to 
+            go right (Ant A) and the other one that chose to go right (Ant B). Additionally, imagine it takes 1 second to walk the route BCD and 10
+            seconds to walk the route BHD.
+            <br><br>
+            Ant A takes the route BCD, taking 1 second. Ant B takes the route BHD, taking 10 seconds. It then reaches the food source at E and walks 
+            back to D. To simplify the explanation, let us say that this only took 5 seconds meaning that ant B has not reached D (this isn't neccesary
+            but it will avoid more complicated maths and still captures the idea). Ant A can now go on its own pheromone trail or on a pheromone-less 
+            trail. Ants are much more likely to chose trails with pheromone so it will chose the former, taking the route DCB and then back to A.
+            <br><br>
+            Now play this with more ants and for more time. Path BCD will gradually build up more and more pheromone due its being shorter than BHD. 
+            This in turn will encourage more ants to take path BCD, which has more pheromone, rather than path BHD, which has less.
+            <br><br>
+            Additionally, pheromone evaporates causing paths that are not frequently reinforced to disappear. Eventually, the trail of ants will
+            look like the drawing in Fig. 1 c).
+        </p>
+        <img src="ants.png" alt="Drawing of ants searching for food from original paper." width="720" height="512">
+        <br><br>
+        <cite>A. Colorni, M. Dorigo et V. Maniezzo, Distributed Optimization by Ant Colonies, actes de la première conférence européenne sur la 
+            vie artificielle, Paris, France, Elsevier Publishing, 134-142, 1991.</cite>
+        
+        <h3>Algorithm (Ant-Quantity)</h3>
+        <p> The steps of the algorithm are as follows:
+            <ol>
+                <li><a href="#explore">Each agent explores the graph stochastically, finding a solution.</a></li>
+                <li><a href="#update">Update path pheromones.</a></li>
+                <li><a href="#terminate">Repeat until termination.</a></li>
+            </ol>
+        </p>
+
+        <a name="explore"></a>
+        <h4>1. Explore graph stochastically, find solution</h4>
+        <p></p>
+        
+        <a name="update"></a>
+        <h4>2. Update path pheromones</h4>
+        <p></p>
+        
+        <a name="terminate"></a>
+        <h4>3. Repeat until termination</h4>
+        <p></p>
+        
+        <h3>Another disclaimer</h3>
+        <p> While, like genetic algorithms, it is a fun idea to make swarm algorithms, they are not advised for use in serious applications.
+            There are much better shortest path algorithms, such as A*, which are much more highly recommended. Greta, I'm afraid you're going
+            to need a bigger boat. Humans 2 - Nature 0.
+        </p>
+
         <hr>
 
         <a name="blackjack"></a>
         <h2>Our Blackjack Genetic Algorithm</h2>
         
         <hr>
+
+        <h2>References</h2>
+        <cite>Colorni, Alberto, Marco Dorigo, Vittorio Maniezzo, Francisco J. Varela and Paul Bourgine. “Distributed Optimization by Ant 
+            Colonies.” (1992).
+            <br><br>
+            A. Colorni, M. Dorigo et V. Maniezzo, Distributed Optimization by Ant Colonies, actes de la première conférence européenne sur 
+            la vie artificielle, Paris, France, Elsevier Publishing, 134-142, 1991.
+            <br><br>
+        </cite>
     </body>
     </html>
