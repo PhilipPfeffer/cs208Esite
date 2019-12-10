@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <title>Bio-Inspired Algorithms</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.min.css" />
 </head>
 
 <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/prism.min.js"></script>
     <header>
         <h1>Bio-Inspired Algorithms</h1>
         <h3>Phil & Raul aka Lil' Git and Yung Commit -m, not necessarily in that order.</h3>
@@ -22,15 +24,17 @@
         <h2>Genetic Algorithms</h2>
         <p>Genetic algorithms are inspired from the natural process of evolution. We will have two running examples. First,
             a general example of trying to solve a maze. And second, a more specific example of trying to create good 
-            blackjack players. The phenomenon is broken down into the five following sections:</p>
+            blackjack players. The phenomenon is broken down into the six following sections:</p>
         <ul>
             <li><a href="#chromosomes">Chromosomes</a></li>
             <li><a href="#generation">Generation</a></li>
             <li><a href="#selection">Selection</a></li>
             <li><a href="#crossover">Crossover</a></li>
             <li><a href="#mutation">Mutation</a></li>
+            <li><a href="#algo">Algorithm</a></li>
         </ul>
-
+        <p> Although we will insert code snippets in all sections belowm if you wish to have a high level overview of how the
+                genetic blackjack algorithm we implemented works, visit our <a href="https://www.github.com/PhilipPfeffer/geneticblackjack">GitHub</a>!</p>
         <a name="chromosomes"></a>
         <h3>Chromosomes</h3>
         <p>A chromosome is a single member of the population. In natural terms, think of this as a single lion, tiger or bear. Oh my!
@@ -48,24 +52,204 @@
             If the dot product between features and weights, w&middot;&Phi;(x), is closer to 1 than to 0, you choose to quit. Conversely, 
             you can choose to hit and draw another card.
         </p>
+        <p>
+            In our code, this is how we defined a chromosome - which we named Player:
+        </p>
+        <pre><code class="language-python">
+class Player():
+    def __init__(self, number=0, startProbs=None, isDealer=False):
+      self.cards = []
+      self.score = 0
+      self.playerNumber = number
+      self.isQuit = False
+      self.isBust = False
+      self.is21 = False
+      self.__featureVector = defaultdict(int)
+      self.__weights = self.initWeights()
+        </code></pre>
 
         <a name="generation"></a>
         <h3>Generation</h3>
         <p>This is an easy one. A generation is a particular set of chromosomes. You can think of it as the population of all players in 
-            the current iteration of the algorithm.
+            the current iteration of the algorithm. Computationally, this will normally be represented as a set or list of individuals (vectors).
+          In our blackjack example, we begin the algorithm by creating the list of random players, the first generation of our possible solutions,
+          as the code snipper below demonstrates:
         </p>
+        <pre><code class="language-python">
+def initializeGeneration(self, n):
+    self.players = [Player(i) for i in range(n)]
+        </code></pre>
 
         <a name="selection"></a>
         <h3>Selection</h3>
-        <p>Talk about fitness function, selective threshold & how this can vary for both maze example and for blackjack example.</p>
+        <p>
+          As first described by Darwin, natural selection is an essential part of the evolutional process of a species. It will determine which individuals 
+          perform better - whatever that might be - given certain conditions, which we know popularly as "survival of the fittest". What it means to perform better
+          is totally open-ended and means different things for different populations in distinct ecosystems. For a polar bear, the ability to hunt seals and to disguise 
+          in white ice is more important than its ability to climb trees, which might be key for other species of bear that live in forests.
+          In our model, we will assign a score to the performance of each chromosome in a generation to assess how well they performed under the problem constraints. 
+          The formula for the score should be the same for all chromosomes across all generations. After determining the best performers, these will be selected to 
+          be the parents of the next generation of individuals, a reproduction process that will involve later steps such as mutation and crossover.
+          <br><br>
+          Going back to blackjack, the score of each chromosome is analogous to the score in the game. The game naturally has a top score constraint (if one 
+          has more than 21 points in one's hands then one goes bust), but we also introduced a bottom score constraint that is supposed to simulate the behavior of the 
+          dealer. Once a player goes bust or does not obtain the minimum score, it won't be selected to be the parent of the next generation, while a player that won the game -
+          had a score higher than the bottom threshold and lower or equal to 21 - will likely be selected to be the root of the following generation,
+          passing on its genes (weights) to its "offspring".
+          <br><br>
+          In code, the selection function was implemented in this way (note that we are not explicitly selecting by score, but the score influences which individuals will be selected):
+
+          TODO Phil  - talk  about the maze example?
+        </p>
+        <pre><code class="language-python">
+def select(self, threshhold):
+    # Returns parents of next generation by removing all:
+    #  - bust players
+    #  - players who got blackjack (pure luck, no genes)
+    #  - players who got above a certain score (threshhold)
+    selection = []
+    for player in self.players:
+        if not player.isBust and player.score >= threshhold and not (len(player.cards)==2 and player.is21):
+            selection.append(player)
+    self.parents = selection
+    return selection
+    # return selection # the parents of the next gene
+        </code></pre>
 
         <a name="crossover"></a>
         <h3>Crossover</h3>
-        <p></p>
+        <p>
+          In nature, however, reproduction is not only about selecting the best performers and making them the parents of the next generations. There are non-deterministic natural 
+          processes that interfere with that.
+          <br><br>
+          One of these processes is crossover, which happens when two chromosomes tangle during cell meiosis and end up exchanging corresponding chunks of genes.
+          On a genetic algorithm model, we simulate this by calculating, for each pair of parents, a random index that will determine the chunk of genes that will
+          be exchanged. For instance, if we have parent_1 = [0,1,2,3,4,5] and parent_2 = [6,7,8,9,10,11], and we calculate a random index of 3, then all the numbers
+          after index 3 in both  parents will be exchanged, resulting in parent_1 = [0,1,2,3,10,11] and parent_2 = [6,7,8,9,4,5]. 
+          <br><br>
+          In both blackjack and maze problems, the crossover happens exactly as described above. If it's still unclear how crossover works, refer to the image below,
+          which provides a visual aid to this process:
+        </p>
+        <img src="static/crossover.png" alt="Crossover illustration."/>
+
+        <p> And in case the image wasn't too clear, here's the  code snippet in which we run the crossover (the function is long, but not hard to parse through): </p>
+        <pre><code class="language-python">
+def crossssover(self, childrenNum):
+    self.genNum += 1
+    children = []
+    numParents = len(self.parents)
+    numParents = numParents if numParents % 2 == 0 else numParents - 1
+    if numParents < 2: pass #init randomly?
+    # print(f"Number of parents: {numParents}")
+    # check even & odd
+    for i in range(0,numParents,2):
+        if i >= childrenNum: break
+        parentWeights0 = self.parents[i].getWeights()
+        parentWeights1 = self.parents[i+1].getWeights()
+        crossoverIndex = randint(0, len(parentWeights0) - 1)
+        
+        child0Weights = {}
+        child1Weights = {}
+        j = 0
+        for weight in parentWeights0:
+            if j < crossoverIndex:
+                child0Weights[weight] = parentWeights0[weight]
+                child1Weights[weight] = parentWeights1[weight]
+            else:
+                child0Weights[weight] = parentWeights1[weight]
+                child1Weights[weight] = parentWeights0[weight]
+            j+=1
+        child0 = Player((childrenNum*self.genNum)+i)
+        child1 = Player((childrenNum*self.genNum)+i+1)
+        child0.updateWeights(child0Weights)
+        child1.updateWeights(child1Weights)
+        children += [child0, child1]
+				</code></pre>
+
+
 
         <a name="mutation"></a>
         <h3>Mutation</h3>
-        <p></p>
+        <p>
+          As we all learned in Middle/High School, when organisms reproduce, it is never guaranteed that the offspring's genome will be purely a combination of 
+          the parent's genes. Most of the times, new individuals are subject to mutations, which happen seemingly randomly. A mutation basically on an indiividual's
+          genome would mean that some new genes not present in the parents' pool of genes are introduced into the individual's genome.
+          <br><br>
+          For our genetic  algorithm, we simulated such effect by going through every chromosome in the new generation and generating two random numbers: one
+          will designate which gene in the chromosome will be changed and the second one will be the value of that gene's replacement. 
+          <br><br>
+          Let's check out how that is done in code:
+        </p>
+        <pre><code class="language-python">
+def mutate(self):
+    for player in self.players:
+        weights = player.getWeights()
+        weightKey = sample(set(weights),1)
+        newWeights = weights
+        newWeights[weightKey[0]] = random()
+        player.updateWeights(newWeights)
+        </code></pre>
+    
+
+        <a name="algo"></a>
+        <h3>The Algorithm </h3>
+        <p>
+          Now that we have all the essential components in our mind, let'stake a look at how the algorithm itself works.
+          <br><br>
+          In the following code snippet, which will call all the previous functions we discussed here, you'll notice there is one extra function we have not discussed yet: casino.
+          <br><br>
+          The casino function basically runs an iteration of the game of the current generation. Therefore, it is easy to see in the snippet below that the algorithm
+          consists of initializing a random generation, then running the casino once, and then for all the remaining generations we will select the best performers,
+          cross their genes over, run the mutations, and then run the casino on the newly born generation, until the last generation. We could set an early stop when
+          the algorithm converges, but for the purposes of this educational example, we decided to keep it simple :) Hope you enjoyed learning about Genetic Blackjack!
+        </p>
+
+        <pre><code class="language-python">
+def main():
+    for threshhold in range(17,22):
+        # print(f'---------\nGeneration {0}')
+        genModel = geneticModel.GeneticModel()
+        genModel.initializeGeneration(PLAYERSPERGEN)
+        blackjackGenetic.casino(DECKNUM, genModel.players)
+        print(f"random score: {genModel.getAvgScore()}")
+        # print(genModel.getAvgScore())
+
+
+        for i in range(1, NUMGENERATIONS):
+            # print(f'---------\nGeneration {i}')
+            genModel.select(threshhold)
+            genModel.crossover(PLAYERSPERGEN)
+            genModel.mutate()
+            blackjackGenetic.casino(DECKNUM, genModel.players)
+            # print(genModel.getAvgScore())
+
+        # print(genModel)
+        print(f"threshhold: {threshhold} --> score: {genModel.getAvgScore()}")
+        </code></pre>
+        <p> In case you were curious: here's the casino function! </p>
+			
+        <pre><code class="language-python">
+def casino(deckNumber, players):
+    deck = Deck(deckNumber) # creates deckNumber number of card decks
+    for player in players: # iterate through all the players 
+        table(deck, [player]) # assign decks and a player to each table, and run the game
+
+def table(deck, players):
+    """Currently only one player allowed per game."""
+    # Deal
+    for player in players:
+        player.dealCards(deck)
+    
+    # Decisions
+    while(not all([player.isBust or player.isQuit or player.is21 for player in players])):
+        for player in players:
+            if player.isBust or player.isQuit or player.is21: continue
+            if player.getPrediction():
+                player.hit(deck)
+            else:
+                player.quit()
+        </code></pre>
+
 
         <h3>Disclaimer: Is it good tho?</h3>
         <p> No. This is a very fun idea to explore, but it boils down to having some very basic selection criteria and very naive 
@@ -112,7 +296,7 @@
             Additionally, pheromone evaporates causing paths that are not frequently reinforced to disappear. Eventually, the trail of ants will
             look like the drawing in Fig. 1 c).
         </p>
-        <img src="ants.png" alt="Drawing of ants searching for food from original paper." width="720" height="512">
+        <img src="static/ants.png" alt="Drawing of ants searching for food from original paper." width="720" height="512">
         <br><br>
         <cite>A. Colorni, M. Dorigo et V. Maniezzo, Distributed Optimization by Ant Colonies, actes de la première conférence européenne sur la 
             vie artificielle, Paris, France, Elsevier Publishing, 134-142, 1991.</cite>
@@ -144,12 +328,6 @@
             to need a bigger boat. Humans 2 - Nature 0.
         </p>
 
-        <hr>
-
-        <a name="blackjack"></a>
-        <h2>Our Blackjack Genetic Algorithm</h2>
-        
-        <hr>
 
         <h2>References</h2>
         <cite>Colorni, Alberto, Marco Dorigo, Vittorio Maniezzo, Francisco J. Varela and Paul Bourgine. “Distributed Optimization by Ant 
