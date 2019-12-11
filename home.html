@@ -312,15 +312,42 @@ def table(deck, players):
 
         <a name="explore"></a>
         <h4>1. Explore graph stochastically, find solution</h4>
-        <p></p>
+        <p> We can model the picture above as a grid made up of tiles. At the beginning, each tile will have no pheromone on it. There will
+            also be a starting point, a food source and potentially several obstacles in the way. We can imagine that while the algorithm 
+            is being run, each tile will accumulate pheromone on it as ants traverse paths that include that tile. For this step, we do not
+            consider how the amount of pheromone is updates on each tile. Instead we imagine we are an ant and consider how we decide what 
+            path to take.
+            <br><br>
+            We decide which path to take as a function of two things:
+            <ol>
+                <li>The amount of pheromone on the tiles, represented by &tau;<sub>i,j</sub>.</li>
+                <li>The reciprocal of the manhattan distance between the food source and the ant, represented by &eta;<sub>i,j</sub> (called the visibility).</li>
+            </ol>
+            In the original formulation of the algorithm, there were also two other factors &alpha; and &beta;, which we will consider constants 
+            to ignore for simplicity.
+
+            The probability with which you choose to move to tile &tau;<sub>i,j</sub> at the given time step is given by the equation:
+            <br><br>
+            <img src="static/tileProb.png" alt="Tile probability" width="202" height="75">, which essentially represents a normalised probability
+            proportional to the multiple between the amount of pheromonne and visibility.
+            
+            Do this for all the ants until they reach a solution from home to food.
+        </p>
         
         <a name="update"></a>
         <h4>2. Update path pheromones</h4>
-        <p></p>
+        <p> Once the ants have found solutions you update the amounnt of pheromone on each tile based on the number of traversals
+            that include that tile on that iteration. You then add that to the amount that was already on that tile multiplied by
+            an evapouration factor, &rho;. You can see this update calculation in the equation:
+            <br><br>
+            <img src="static/pheromoneUpdate.png" alt="Pheromone Update" width="1000" height="70"> 
+            <br><br>where <br><br>
+            <img src="static/transition.png" alt="Transition" width="800" height="150">
+        </p>
         
         <a name="terminate"></a>
         <h4>3. Repeat until termination</h4>
-        <p></p>
+        <p> Repeat until you converge on a satisfactory answer.</p>
         
         <h3>Another disclaimer</h3>
         <p> While, like genetic algorithms, it is a fun idea to make swarm algorithms, they are not advised for use in serious applications.
